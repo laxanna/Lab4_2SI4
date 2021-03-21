@@ -1,4 +1,4 @@
-public class HashTableLin {
+public class HashTableQuad {
 	private int [] table;
 	
 	boolean prime(int num) {
@@ -10,7 +10,7 @@ public class HashTableLin {
 		return true;
 	}
 	
-	public HashTableLin(int maxNum, double load){
+	public HashTableQuad(int maxNum, double load){
 		int a = (int)(maxNum*load);
 		while(prime(a)== false) {
 			a++;
@@ -38,21 +38,23 @@ public class HashTableLin {
 		int h = 0;									//check if the value being has or have to return back to the beginning of the table to hash
 		int a=n%table.length;						//identify the place to hatch
 		//linear hashing the value
-		for(int i =a; i<table.length; i++) {
-			if(table[i]==0) {
-				table[i] = n;
-				h =1;								//1 means the value is inserted
-				break;
-			}
-		}
-		
-		//hash from the beginning if the value is not inserted yet
-		if(h == 0) {
-			for(int i=0; i<a; i++) {
-				if(table[i] == 0) {
-					table[i] = n;
+		int j = 0;
+		int k = a;
+		int track = 0;
+		while(h==0) {
+			while(k<table.length) {
+				if(table[k]==0) {
+					table[k] = n;
+					h =1;								//1 means the value is inserted
+					break;
+				}
+				else {
+					k+=2^j;
+					j++;
+					track = k;
 				}
 			}
+			k= track-table.length;
 		}
 	}
 		
@@ -91,5 +93,4 @@ public class HashTableLin {
 			}
 		}
 	}
-	
 }

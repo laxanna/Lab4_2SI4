@@ -1,5 +1,3 @@
-package lab4;
-
 import java.util.Random;
 
 public class TestHashTable {
