@@ -1,49 +1,82 @@
 public class HashTableQuad {
-	private int [] table;
+	private Integer [] table;
+	private int TableSize;
+	private int NumKeys;
+	private double MaxLoadFactor;
 	
-	boolean prime(int num) {
-		for(int i = 2; i<= num; i++) {
-			if(num%i == 0) {
-				return false;		
+	public int isPrime(int n) {
+        for (int i = 2; i < n; i++) {
+            if (n % i == 0) {
+                return 0;
+            }
+        }
+        return 1;
+    }
+	
+	//assigned all the private parameters
+	public HashTableQuad(int maxNum, double load){
+		int a = (int)(maxNum/load);
+		int h = 0;
+		while(h == 0) {
+			if(isPrime(a) != h) {
+				h=1;
+			}
+			else {
+				a++;
 			}
 		}
-		return true;
+		this.table = new Integer[a];
+		this.TableSize = a;
+		this.NumKeys = 0;
+		this.MaxLoadFactor = load;
 	}
-	
-	public HashTableQuad(int maxNum, double load){
-		int a = (int)(maxNum*load);
-		while(prime(a)== false) {
-			a++;
+	//get methods
+	public int getTableSize() {
+		return TableSize;
+	}
+	public int getNumKeys() {
+		int num = 0;
+		for(int i=0; i<table.length; i++) {
+			if(table[i] !=null) {
+				num++;
+			}
 		}
-		this.table = new int[a];
+		NumKeys = num;
+		return NumKeys;
+	}
+	public double getMaxLoadFactor() {
+		return MaxLoadFactor;
 	}
 	
-	public void insert(int n) throws ArithmeticException {
+	
+	//run time: max run = n
+	public void insert(int n){
 		//check if the value exist in the table
 		//check if the table is full
-		int check =0;																//initiate check value
-		for(int i=0; i<table.length; i++) {											//search through the table
-			if(n == table[i]) {
-				throw new ArithmeticException ("Value exist in the hash table");
-			}
-			if(table[i] == 0) {														//check for an available spot
-				check ++;															//count available spots
+																	//initiate check value
+		for(int i=0; i<TableSize; i++) {											//search through the table
+			if(null != table[i]) {
+				if(n == table[i]) {
+					return;
+				}
 			}
 		}
-		if(check==0) {																//if there is none available spot, rehash
+		
+		
+		if((double)(NumKeys+1)/TableSize > MaxLoadFactor) {	
 			rehash();
 		}
 			
 		//insert the value in the hashing table
 		int h = 0;									//check if the value being has or have to return back to the beginning of the table to hash
-		int a=n%table.length;						//identify the place to hatch
+		int a=n%TableSize;						//identify the place to hatch
 		//linear hashing the value
 		int j = 0;
 		int k = a;
 		int track = 0;
 		while(h==0) {
-			while(k<table.length) {
-				if(table[k]==0) {
+			while(k<TableSize) {
+				if(table[k]==null) {
 					table[k] = n;
 					h =1;								//1 means the value is inserted
 					break;
@@ -54,33 +87,42 @@ public class HashTableQuad {
 					track = k;
 				}
 			}
-			k= track-table.length;
+			k= track-TableSize;
 		}
 	}
+	
 		
 	private void rehash(){
-		int a = table.length*2;
-		while(prime(a)== false) {
-			a++;
+		HashTableQuad big = new HashTableQuad(this.NumKeys*2,this.MaxLoadFactor);
+		
+		for(int x=0; x<TableSize;x++) {
+			if(table[x]!=null) {
+				big.insert(this.table[x]);
+			}
 		}
-		this.table = new int[a];
+		this.table = big.table;
+		this.TableSize = big.TableSize;
+		this.NumKeys = big.NumKeys;
+		return;
 	}
 	
 	public boolean isIn(int n) {
 		//check if the value exists or not
 		for(int i=0; i<table.length; i++) {
-			if(n == table[i]) {
-				return true;
+			if(table[i] != null){
+				if(n == table[i]) {
+					return true;
+				}
 			}
 		}
-		return false;
+		return false;	
 	}
 	
 	public void printKeys() {
 		//print
 		for(int i=0; i<table.length; i++) {
-			if(table[i]!=0) {
-				System.out.print(table[i] + " ");
+			if(table[i]!=null) {
+				System.out.println("Print Keys" + table[i] + " ");
 			}
 		}
 	}
@@ -88,9 +130,47 @@ public class HashTableQuad {
 	public void printKeysAndIndexes() {
 		//print
 		for(int i=0; i<table.length; i++) {
-			if(table[i]!=0) {
-				System.out.print(table[i] + " index:" + i + " ");
+			if(table[i]!=null) {
+				System.out.println("Print Keys" + table[i] + " index:" + i + " ");
 			}
 		}
 	}
+	
+	public int insertCount(int n){
+		if((double)(NumKeys+1)/TableSize > MaxLoadFactor) {	
+			rehash();
+		}
+			
+		//insert the value in the hashing table
+		int h = 0;									//check if the value being has or have to return back to the beginning of the table to hash
+		int a=n%TableSize;						//identify the place to hatch
+		//linear hashing the value
+		int j = 0;
+		int k = a;
+		int track = 0;
+		int count = 0;
+		while(h==0) {
+			while(k<TableSize) {
+				count ++;
+				if(table[k]==null) {
+					table[k] = n;
+					h =1;								//1 means the value is inserted
+					break;
+				}
+				else {
+					if(table[k] == n) {
+						return count;
+					}
+					else {
+						k+=2^j;
+						j++;
+						track = k;
+					}
+				}
+			}
+			k= track-TableSize;
+		}
+		return count;
+	}
+	
 }
